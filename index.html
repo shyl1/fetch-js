@@ -5,11 +5,102 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .div1 {
+      margin-bottom: 5px;
+      border: 1px solid black;
+      padding: 20px;
+    }
+  </style>
   
 </head>
 <body>
+
+  <div class="div1">
+    <h2>xml</h2>
+    <div id="xml-data"></div>
+  </div>
+
+  <div class="div1">
+    <h2>fetch Promise-based</h2>
+    <div id="fetch-data"></div>
+  </div>
+
+  <div class="div1">
+    <h2>axios</h2>
+    <div id="axios-data"></div>
+  </div>
+
+  <div class="div1">
+    <h2>async/await</h2>
+    <div id="await-data"></div>
+  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.9.0/axios.min.js" integrity="sha512-FPlUpimug7gt7Hn7swE8N2pHw/+oQMq/+R/hH/2hZ43VOQ+Kjh25rQzuLyPz7aUWKlRpI7wXbY6+U3oFPGjPOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   
-  <script src="axios.js"></script>
+  <script >
+    const API_URL = "https://fakestoreapi.com/products";
+
+    // method one xmlhttp 
+    const xmlDiv = document.getElementById("xml-data");
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", API_URL);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        const products = JSON.parse(xhr.responseText);
+        xmlDiv.innerHTML = products.slice(0, 3).map(p => `
+          <div class="product">
+            <strong>${p.title}</strong> - $${p.price}
+          </div>
+        `).join("");
+      } else {
+        xmlDiv.innerHTML = "Error loading data";
+      }
+    };
+    xhr.send();
+
+    //metod 2 promise
+    const fetchDiv = document.getElementById("fetch-data");
+    fetch(API_URL)
+  .then(response => response.json()).then(products => {
+    fetchDiv.innerHTML = products.slice(0, 3).map(p => `
+          <div class="product">
+              <strong>${p.title}</strong> - $${p.price}
+          </div>
+    `).join(" ");
+  })
+  .catch(() => fetchDiv.innerHTML = "error loading data");
+
+  //3- async /await 
+  const asyncDiv = document.getElementById("await-data");
+    (async () => {
+      try {
+        const res = await fetch(API_URL);
+        const products = await res.json();
+        asyncDiv.innerHTML = products.slice(0, 3).map(p => `
+          <div class="product">
+            <strong>${p.title}</strong> - $${p.price}
+          </div>
+        `).join("");
+      } catch {
+        asyncDiv.innerHTML = "Error loading data";
+      }
+    })();
+
+    // 4- axios
+    const axiosDiv = document.getElementById("axios-data");
+    axios.get(API_URL)
+      .then(res => {
+        const products = res.data;
+        axiosDiv.innerHTML = products.slice(0, 3).map(p => `
+          <div class="product">
+            <strong>${p.title}</strong> - $${p.price}
+          </div>
+        `).join("");
+      })
+      .catch(() => {
+        axiosDiv.innerHTML = "Error loading data";
+      });
+
+  </script>
 </body>
 </html>
